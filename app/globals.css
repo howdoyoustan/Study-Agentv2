@@ -1,26 +1,257 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* =====================================================================
+   SCREEN — Mermaid diagram wrapper (white card in dark UI)
+   ===================================================================== */
+.mermaid-screen {
+  background: white;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.mermaid-screen svg {
+  max-width: 100%;
+  height: auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* =====================================================================
+   SCREEN — Markdown answer styles
+   Dense, readable in dark UI. No wasted vertical space.
+   ===================================================================== */
+.screen-md {
+  font-size: 0.875rem;   /* 14px */
+  line-height: 1.45;
+  color: #e5e7eb;        /* gray-200 */
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.screen-md p {
+  margin: 0 0 4px 0;
+}
+
+.screen-md strong {
+  color: #f9fafb;        /* near-white for emphasis */
+  font-weight: 600;
+}
+
+.screen-md ul {
+  margin: 0 0 4px 0;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.screen-md ol {
+  margin: 0 0 4px 0;
+  padding-left: 1.25rem;
+  list-style-type: decimal;
+}
+
+.screen-md li {
+  margin: 0;
+  padding: 0;
+}
+
+.screen-md li + li {
+  margin-top: 1px;
+}
+
+/* Section headings rendered from **bold** paragraphs */
+.screen-md h1,
+.screen-md h2,
+.screen-md h3,
+.screen-md h4 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #f3f4f6;
+  margin: 6px 0 1px 0;
+}
+
+/* =====================================================================
+   PRINT STYLES
+   Target: 57 mm thermal paper, ~51 mm usable width, 203 DPI
+   ===================================================================== */
+
+@page {
+  size: 57mm auto;
+  margin: 1mm 3mm;
+}
+
+@media print {
+  .no-print,
+  header,
+  nav {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 57mm;
+    font-size: 8pt;
+    line-height: 1.2;
+    font-family: "Courier New", Courier, monospace;
+    background: white;
+    color: black;
+  }
+
+  /* Mermaid SVG — scale to usable width, force B&W */
+  .print-mermaid svg {
+    width: 51mm !important;
+    height: auto !important;
+    max-width: 51mm !important;
+    display: block;
+  }
+
+  .print-mermaid svg * {
+    stroke: black !important;
+    fill: white !important;
+  }
+
+  .print-mermaid svg text,
+  .print-mermaid svg .label,
+  .print-mermaid svg .nodeLabel {
+    fill: black !important;
+    color: black !important;
+    font-size: 6pt !important;
+    font-family: "Courier New", Courier, monospace !important;
+  }
+
+  .print-mermaid svg rect,
+  .print-mermaid svg polygon,
+  .print-mermaid svg ellipse,
+  .print-mermaid svg circle {
+    fill: white !important;
+    stroke: black !important;
+    stroke-width: 0.5pt !important;
+  }
+
+  .print-mermaid svg path,
+  .print-mermaid svg line,
+  .print-mermaid svg polyline {
+    stroke: black !important;
+    fill: none !important;
+    stroke-width: 0.5pt !important;
+  }
+
+  /* Compact print markdown */
+  .print-md p,
+  .print-md ul,
+  .print-md ol,
+  .print-md li,
+  .print-md h1,
+  .print-md h2,
+  .print-md h3,
+  .print-md h4,
+  .print-md strong {
+    font-family: "Courier New", Courier, monospace !important;
+    font-size: 8pt !important;
+    line-height: 1.2 !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* =====================================================================
+   PRINT ZONE LAYOUT
+   ===================================================================== */
+.print-only {
+  display: none;
+}
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+.print-zone {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 8pt;
+  line-height: 1.2;
+  color: black;
+  background: white;
+  padding: 0;
+  margin: 0;
+  width: 51mm;
+}
+
+/* =====================================================================
+   PRINT — Markdown styles (compact, thermal-optimised)
+   ===================================================================== */
+.print-md {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 8pt;
+  line-height: 1.2;
+  color: black;
+}
+
+.print-md p {
+  margin: 0 0 2pt 0;
+}
+
+.print-md strong {
+  font-weight: bold;
+}
+
+.print-md ul {
+  margin: 0 0 2pt 0;
+  padding-left: 10pt;
+  list-style-type: disc;
+}
+
+.print-md ol {
+  margin: 0 0 2pt 0;
+  padding-left: 10pt;
+  list-style-type: decimal;
+}
+
+.print-md li {
+  margin: 0;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.print-md h1,
+.print-md h2,
+.print-md h3,
+.print-md h4 {
+  font-size: 8pt;
+  font-weight: bold;
+  margin: 3pt 0 0 0;
+  line-height: 1.2;
+}
+
+/* Mermaid in print zone */
+.print-mermaid {
+  margin: 3pt 0;
+  page-break-inside: avoid;
+  overflow: hidden;
+}
+
+/* Fallback raw code when mermaid can't render */
+.print-mermaid-fallback {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 6pt;
+  line-height: 1.1;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border: 0.5pt solid #999;
+  padding: 2pt;
+  margin: 2pt 0;
+  page-break-inside: avoid;
 }
