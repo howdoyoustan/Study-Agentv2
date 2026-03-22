@@ -343,10 +343,54 @@ export default function StudyAgentPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Prepare failed");
-      addLog(
-        "Prepare triggered — indexing has started on WAIP. Wait 1-2 minutes before querying.",
-        "success"
-      );
+
+      const workflowId: string = data._id;
+      if (!workflowId) {
+        addLog("Prepare triggered (no workflow id returned — cannot poll status).", "success");
+        return;
+      }
+
+      addLog(`Prepare job started (workflow: ${workflowId}) — polling for completion...`);
+
+      // Poll until Completed or Failed (WAIP cycles: Started → Waiting → Indexing → Completed)
+      const TERMINAL = new Set(["Completed", "Failed", "Error"]);
+      let attempts = 0;
+      const MAX_ATTEMPTS = 60; // 5 min at 5-second intervals
+
+      while (attempts < MAX_ATTEMPTS) {
+        await new Promise((r) => setTimeout(r, 5000));
+        attempts++;
+
+        const pollRes = await fetch(`/api/datasets/${id}/workflow/${workflowId}`);
+        const pollData = await pollRes.json();
+
+        if (pollData.error) {
+          addLog(`Status check error: ${pollData.error}`, "error");
+          break;
+        }
+
+        const status: string = pollData.status ?? "Unknown";
+        addLog(`Prepare status: ${status}`);
+
+        if (TERMINAL.has(status)) {
+          if (status === "Completed") {
+            addLog(
+              "Index preparation complete — documents are now processed and ready to query.",
+              "success"
+            );
+          } else {
+            addLog(`Prepare job ended with status: ${status}`, "error");
+          }
+          break;
+        }
+      }
+
+      if (attempts >= MAX_ATTEMPTS) {
+        addLog(
+          "Prepare is taking longer than 5 minutes — check the WAIP portal for status.",
+          "error"
+        );
+      }
     } catch (e: unknown) {
       addLog((e as Error).message, "error");
     }

@@ -87,12 +87,32 @@ export async function waipCreateDataset(
 /**
  * Prepare endpoint is a skill-level route, NOT a per-dataset route.
  * POST /v1.1/skills/doc_completion/prepare  { dataset_id: "..." }
+ * Returns { _id: workflowId, status: "Started", ... }
  */
-export async function waipPrepareDataset(datasetId: string): Promise<unknown> {
+export async function waipPrepareDataset(
+  datasetId: string
+): Promise<{ _id: string; status: string; [key: string]: unknown }> {
   const client = jsonClient();
-  const res = await client.post("/v1.1/skills/doc_completion/prepare", {
-    dataset_id: datasetId,
-  });
+  const res = await client.post<{ _id: string; status: string }>(
+    "/v1.1/skills/doc_completion/prepare",
+    { dataset_id: datasetId }
+  );
+  return res.data;
+}
+
+/**
+ * Poll the workflow status for a prepare job.
+ * GET /v1.1/datasets/{datasetId}/workflow/{workflowId}
+ * Status cycles: Started → Waiting → Indexing → Completed | Failed
+ */
+export async function waipGetWorkflowStatus(
+  datasetId: string,
+  workflowId: string
+): Promise<{ status: string; [key: string]: unknown }> {
+  const client = jsonClient();
+  const res = await client.get<{ status: string }>(
+    `/v1.1/datasets/${datasetId}/workflow/${workflowId}`
+  );
   return res.data;
 }
 
