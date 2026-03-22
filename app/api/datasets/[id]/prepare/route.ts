@@ -13,6 +13,7 @@ export async function POST(
       return NextResponse.json({ error: "Dataset id is required" }, { status: 400 });
     }
     const result = await waipPrepareDataset(id);
+    console.log("[prepare] WAIP result:", JSON.stringify(result));
     // result._id is the workflow_id the client can poll for status
     return NextResponse.json(result ?? { status: "prepare triggered", dataset_id: id });
   } catch (err: unknown) {

@@ -344,9 +344,14 @@ export default function StudyAgentPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Prepare failed");
 
-      const workflowId: string = data._id;
+      console.log("[prepare] WAIP response:", JSON.stringify(data));
+
+      const workflowId: string = data._id ?? data.workflow_id ?? data.id;
       if (!workflowId) {
-        addLog("Prepare triggered (no workflow id returned — cannot poll status).", "success");
+        addLog(
+          `Prepare triggered — WAIP response: ${JSON.stringify(data)}. If status shows "Started" your documents are being indexed (check again in 1-2 min).`,
+          "success"
+        );
         return;
       }
 
