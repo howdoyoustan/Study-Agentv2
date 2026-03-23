@@ -1,5 +1,5 @@
 export const DEFAULT_DATASET_ID =
-  process.env.WAIP_DATASET_ID ?? "bbbc8e61-1c90-4ba4-b99a-98281ac4f534";
+  process.env.WAIP_DATASET_ID ?? "e074b5ce-7879-4eb2-a500-e3b4d945ca86";
 
 /** Model used for both RAG retrieval and LLM synthesis — override via env */
 export const DEFAULT_MODEL = process.env.WAIP_MODEL_NAME ?? "gpt-4o";
